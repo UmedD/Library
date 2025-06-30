@@ -106,3 +106,22 @@ func deleteAuthor(c *gin.Context) {
 	logger.Info.Printf("deleteAuthor: deleted author ID=%d", id)
 	c.Status(http.StatusNoContent)
 }
+
+func searchAuthorsByName(c *gin.Context) {
+	fragment := c.Query("name")
+	if fragment == "" {
+		logger.Warn.Println("searchAuthorsByName: missing query param 'name'")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "query parameter 'name' is required"})
+		return
+	}
+
+	authors, err := service.SearchAuthorsByName(fragment)
+	if err != nil {
+		logger.Error.Printf("searchAuthorsByName: service error: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	logger.Info.Printf("searchAuthorsByName: returned %d authors for fragment=%q", len(authors), fragment)
+	c.JSON(http.StatusOK, authors)
+}

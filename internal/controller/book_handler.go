@@ -43,13 +43,25 @@ func getBookByID(c *gin.Context) {
 	c.JSON(http.StatusOK, book)
 }
 
+type createBookInput struct {
+	Name     string `json:"name"     binding:"required"`
+	Title    string `json:"title"    binding:"required"`
+	AuthorID int    `json:"author_id" binding:"required"`
+}
+
 // createBook создаёт новую книгу.
 func createBook(c *gin.Context) {
-	var b models.Book
-	if err := c.BindJSON(&b); err != nil {
+	var in createBookInput
+	if err := c.BindJSON(&in); err != nil {
 		logger.Error.Printf("createBook: bind error: %v", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
+	}
+
+	b := models.Book{
+		Name:     in.Name,
+		Title:    in.Title,
+		AuthorID: in.AuthorID,
 	}
 
 	if err := service.CreateBook(&b); err != nil {
@@ -57,6 +69,7 @@ func createBook(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
 	logger.Info.Printf("createBook: created book ID=%d title=%q", b.ID, b.Title)
 	c.JSON(http.StatusCreated, b)
 }
@@ -105,4 +118,23 @@ func deleteBook(c *gin.Context) {
 	}
 	logger.Info.Printf("deleteBook: deleted book ID=%d", id)
 	c.Status(http.StatusNoContent)
+}
+
+func searchBooksByName(c *gin.Context) {
+	fragment := c.Query("name")
+	if fragment == "" {
+		logger.Warn.Println("searchBooksByName: missing query param 'name'")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "query parameter 'name' is required"})
+		return
+	}
+
+	books, err := service.SearchBooksByName(fragment)
+	if err != nil {
+		logger.Error.Printf("searchBooksByName: service error: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	logger.Info.Printf("searchBooksByName: returned %d books for fragment=%q", len(books), fragment)
+	c.JSON(http.StatusOK, books)
 }

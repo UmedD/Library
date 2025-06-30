@@ -35,4 +35,16 @@ CREATE TABLE IF NOT EXISTS users
 ALTER TABLE users
     ALTER COLUMN role SET DEFAULT 'user';
 
+ALTER TABLE books
+    ADD COLUMN author_id INTEGER NULL
+        REFERENCES authors(id) ON DELETE RESTRICT;
 
+SELECT
+    b.id,
+    b.name,
+    b.title,
+    b.author_id,
+    a.name AS author_name
+FROM books b
+         JOIN authors a ON a.id = b.author_id
+WHERE b.id = 3;

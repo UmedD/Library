@@ -65,3 +65,14 @@ func DeleteBookByID(bookID int) error {
 	logger.Info.Printf("service.DeleteBookByID: deleted book ID=%d", bookID)
 	return nil
 }
+
+func SearchBooksByName(fragment string) ([]models.Book, error) {
+	logger.Debug.Printf("service.SearchBooksByName: start fragment=%q", fragment)
+	books, err := repository.SearchBooksByName(fragment)
+	if err != nil {
+		logger.Error.Printf("service.SearchBooksByName: error searching books fragment=%q: %v", fragment, err)
+		return nil, err
+	}
+	logger.Info.Printf("service.SearchBooksByName: found %d books matching %q", len(books), fragment)
+	return books, nil
+}

@@ -67,3 +67,22 @@ func DeleteAuthorByID(authorID int) error {
 	logger.Info.Printf("repo.DeleteAuthorByID: deleted author ID=%d", authorID)
 	return nil
 }
+
+func SearchAuthorsByName(fragment string) ([]models.Author, error) {
+	logger.Debug.Printf("repo.SearchAuthorsByName: executing SELECT for fragment=%q", fragment)
+
+	query := `
+        SELECT id, name
+          FROM authors
+         WHERE name ILIKE '%' || $1 || '%'
+    `
+	var authors []models.Author
+	err := db.GetDBConn().Select(&authors, query, fragment)
+	if err != nil {
+		logger.Error.Printf("repo.SearchAuthorsByName: query error fragment=%q: %v", fragment, err)
+		return nil, translateError(err)
+	}
+
+	logger.Info.Printf("repo.SearchAuthorsByName: found %d authors matching %q", len(authors), fragment)
+	return authors, nil
+}

@@ -65,3 +65,14 @@ func DeleteAuthorByID(authorID int) error {
 	logger.Info.Printf("service.DeleteAuthorByID: deleted author ID=%d", authorID)
 	return nil
 }
+
+func SearchAuthorsByName(fragment string) ([]models.Author, error) {
+	logger.Debug.Printf("service.SearchAuthorsByName: start fragment=%q", fragment)
+	authors, err := repository.SearchAuthorsByName(fragment)
+	if err != nil {
+		logger.Error.Printf("service.SearchAuthorsByName: error searching authors fragment=%q: %v", fragment, err)
+		return nil, err
+	}
+	logger.Info.Printf("service.SearchAuthorsByName: returned %d authors matching %q", len(authors), fragment)
+	return authors, nil
+}

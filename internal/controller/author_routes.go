@@ -9,6 +9,7 @@ func RegisterAuthorRoutes(r *gin.Engine) {
 	// публичные руты
 	r.GET("/authors", getAllAuthors)
 	r.GET("/authors/:id", getAuthorByID)
+	r.GET("/authors/search", searchAuthorsByName)
 
 	// защищённые руты
 	authBooks := r.Group("/authors", middleware.JWTAuthMiddleware, middleware.AdminOnly)
