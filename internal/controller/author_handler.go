@@ -11,7 +11,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// getAllAuthors возвращает список всех авторов.
+// @Summary     Список авторов
+// @Description Возвращает всех авторов
+// @Tags        authors
+// @Produce     json
+// @Success     200 {array} models.Author
+// @Failure     500 {object} models.ErrorResponse
+// @Router      /authors [get]
 func getAllAuthors(c *gin.Context) {
 	authors, err := service.GetAllAuthors()
 	if err != nil {
@@ -23,7 +29,15 @@ func getAllAuthors(c *gin.Context) {
 	c.JSON(http.StatusOK, authors)
 }
 
-// getAuthorByID возвращает автора по его ID.
+// @Summary     Автор по ID
+// @Description Возвращает одного автора по его ID
+// @Tags        authors
+// @Produce     json
+// @Param       id   path      int  true  "ID автора"
+// @Success     200  {object}  models.Author
+// @Failure     400 {object} models.ErrorResponse
+// @Failure     404 {object} models.ErrorResponse
+// @Router      /authors/{id} [get]
 func getAuthorByID(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
@@ -43,7 +57,17 @@ func getAuthorByID(c *gin.Context) {
 	c.JSON(http.StatusOK, author)
 }
 
-// createAuthor создаёт нового автора.
+// @Summary     Создать автора
+// @Description Добавляет нового автора (Admin only)
+// @Tags        authors
+// @Security    ApiKeyAuth
+// @Accept      json
+// @Produce     json
+// @Param       author  body      models.Author  true  "Имя нового автора"
+// @Success     201     {object}  models.Author
+// @Failure     400 {object} models.ErrorResponse
+// @Failure     500 {object} models.ErrorResponse
+// @Router      /authors [post]
 func createAuthor(c *gin.Context) {
 	var a models.Author
 	if err := c.BindJSON(&a); err != nil {
@@ -61,7 +85,19 @@ func createAuthor(c *gin.Context) {
 	c.JSON(http.StatusCreated, a)
 }
 
-// updateAuthor обновляет данные существующего автора.
+// @Summary     Обновить автора
+// @Description Меняет имя автора по ID (Admin only)
+// @Tags        authors
+// @Security    ApiKeyAuth
+// @Accept      json
+// @Produce     json
+// @Param       id      path      int            true  "ID автора"
+// @Param       author  body      models.Author  true  "Новое имя автора"
+// @Success     200     {object}  models.Author
+// @Failure     400 {object} models.ErrorResponse
+// @Failure     404 {object} models.ErrorResponse
+// @Failure     500 {object} models.ErrorResponse
+// @Router      /authors/{id} [put]
 func updateAuthor(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
@@ -88,7 +124,17 @@ func updateAuthor(c *gin.Context) {
 	c.JSON(http.StatusOK, a)
 }
 
-// deleteAuthor удаляет автора по ID.
+// @Summary     Удалить автора
+// @Description Удаляет автора по ID (Admin only)
+// @Tags        authors
+// @Security    ApiKeyAuth
+// @Produce     json
+// @Param       id   path      int  true  "ID автора"
+// @Success     204 {string}  string  "No Content"
+// @Failure     400 {object} models.ErrorResponse
+// @Failure     404 {object} models.ErrorResponse
+// @Failure     500 {object} models.ErrorResponse
+// @Router      /authors/{id} [delete]
 func deleteAuthor(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)

@@ -11,7 +11,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// getAllBooks возвращает список всех книг.
+// @Summary     Список книг
+// @Description Возвращает все книги с вложенным именем автора
+// @Tags        books
+// @Produce     json
+// @Success     200 {array} models.Book
+// @Failure     500 {object} models.ErrorResponse
+// @Security    ApiKeyAuth
+// @Router      /books [get]
 func getAllBooks(c *gin.Context) {
 	books, err := service.GetAllBooks()
 	if err != nil {
@@ -23,7 +30,17 @@ func getAllBooks(c *gin.Context) {
 	c.JSON(http.StatusOK, books)
 }
 
-// getBookByID возвращает книгу по её ID.
+// @Summary     Книга по ID
+// @Description Возвращает книгу и имя автора по её ID
+// @Tags        books
+// @Produce     json
+// @Param       id   path      int  true  "ID книги"
+// @Success     200  {object}  models.Book
+// @Failure     400 {object} models.ErrorResponse
+// @Failure     404 {object} models.ErrorResponse
+// @Failure     500 {object} models.ErrorResponse
+// @Security    ApiKeyAuth
+// @Router      /books/{id} [get]
 func getBookByID(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
@@ -49,7 +66,17 @@ type createBookInput struct {
 	AuthorID int    `json:"author_id" binding:"required"`
 }
 
-// createBook создаёт новую книгу.
+// @Summary     Создать книгу
+// @Description Добавляет новую книгу (требуется роль admin)
+// @Tags        books
+// @Accept      json
+// @Produce     json
+// @Param       book  body      controller.createBookInput  true  "Поля новой книги"
+// @Success     201   {object}  models.Book
+// @Failure     400 {object} models.ErrorResponse
+// @Failure     500 {object} models.ErrorResponse
+// @Security    ApiKeyAuth
+// @Router      /books [post]
 func createBook(c *gin.Context) {
 	var in createBookInput
 	if err := c.BindJSON(&in); err != nil {
@@ -74,7 +101,19 @@ func createBook(c *gin.Context) {
 	c.JSON(http.StatusCreated, b)
 }
 
-// updateBook обновляет данные существующей книги.
+// @Summary     Обновить книгу
+// @Description Обновляет данные книги по ID (требуется роль admin)
+// @Tags        books
+// @Accept      json
+// @Produce     json
+// @Param       id    path      int                        true  "ID книги"
+
+// @Success     200   {object}  models.Book
+// @Failure     400 {object} models.ErrorResponse
+// @Failure     404 {object} models.ErrorResponse
+// @Failure     500 {object} models.ErrorResponse
+// @Security    ApiKeyAuth
+// @Router      /books/{id} [put]
 func updateBook(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
@@ -101,7 +140,17 @@ func updateBook(c *gin.Context) {
 	c.JSON(http.StatusOK, b)
 }
 
-// deleteBook удаляет книгу по ID.
+// @Summary     Удалить книгу
+// @Description Удаляет книгу по ID (требуется роль admin)
+// @Tags        books
+// @Produce     json
+// @Param       id   path      int  true  "ID книги"
+// @Success     204 {string}  string  "No Content"
+// @Failure     400 {object} models.ErrorResponse
+// @Failure     404 {object} models.ErrorResponse
+// @Failure     500 {object} models.ErrorResponse
+// @Security    ApiKeyAuth
+// @Router      /books/{id} [delete]
 func deleteBook(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
@@ -120,6 +169,16 @@ func deleteBook(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
+// @Summary     Поиск книг по названию
+// @Description Возвращает книги, в названии которых встречается фрагмент
+// @Tags        books
+// @Produce     json
+// @Param       name  query     string  true  "Фрагмент в названии"
+// @Success     200   {array}   models.Book
+// @Failure     400 {object} models.ErrorResponse
+// @Failure     500 {object} models.ErrorResponse
+// @Security    ApiKeyAuth
+// @Router      /books/search [get]
 func searchBooksByName(c *gin.Context) {
 	fragment := c.Query("name")
 	if fragment == "" {

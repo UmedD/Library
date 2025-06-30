@@ -1,3 +1,9 @@
+// @title         OnlineLibrary API
+// @version       1.0
+// @description   RESTful API сервиса OnlineLibrary
+// @host          localhost:9091
+// @BasePath      /
+
 package main
 
 import (
@@ -36,6 +42,7 @@ func main() {
 	// 5) Инициализируем роутер
 	r := gin.Default()
 
+	setupSwagger(r)
 	// 6) Регистрируем публичные и защищённые маршруты
 	controller.RegisterAuthRoutes(r)   // /auth/sign-up, /auth/sign-in
 	controller.RegisterUserRoutes(r)   // /users (GET открытые, POST/PUT/DELETE через JWT+AdminOnly)

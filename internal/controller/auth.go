@@ -14,6 +14,17 @@ type signUpInput struct {
 	Password string `json:"password" binding:"required,min=6"`
 }
 
+// SignUp godoc
+// @Summary      Регистрация пользователя
+// @Description  Принимает username, email и пароль, создает нового пользователя в БД
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        input  body      signUpInput  true  "Данные для регистрации"
+// @Success      201    {object}  map[string]string  "{"message":"user registered successfully"}"
+// @Failure      400    {object}  map[string]string  "{"error":"validation error"}"
+// @Failure      500    {object}  map[string]string  "{"error":"internal error"}"
+// @Router       /auth/sign-up [post]
 func SignUp(c *gin.Context) {
 	var in signUpInput
 	if err := c.ShouldBindJSON(&in); err != nil {
@@ -41,10 +52,18 @@ type signInInput struct {
 	Password string `json:"password" binding:"required"`
 }
 
-// SignIn — POST /auth/sign-in.
-// Принимает JSON { "username": "...", "password": "..." },
-// проверяет через service.AuthenticateUser, затем генерирует JWT
-// с userID, username и role из БД и возвращает его.
+// SignIn godoc
+// @Summary      Аутентификация пользователя
+// @Description  Принимает username и пароль, возвращает JWT
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        input  body      signInInput  true  "Данные для входа"
+// @Success      200    {object}  map[string]string  "{"access_token":"…"}"
+// @Failure      400    {object}  map[string]string  "{"error":"validation error"}"
+// @Failure      401    {object}  map[string]string  "{"error":"invalid credentials"}"
+// @Failure      500    {object}  map[string]string  "{"error":"could not generate token"}"
+// @Router       /auth/sign-in [post]
 func SignIn(c *gin.Context) {
 	var in signInInput
 	if err := c.ShouldBindJSON(&in); err != nil {
